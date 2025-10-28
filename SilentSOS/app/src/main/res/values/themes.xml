@@ -1,8 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.SilentSOS" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/orange</item>
+        <!-- Secondary color -->
+<!--        <item name="colorSecondary">@color/blue</item>-->
+        <!-- Background color -->
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Checkbox tint globally -->
+<!--        <item name="checkboxStyle">@style/MyCheckbox</item>-->
+        <item name="android:fontFamily">@font/inter_semibold</item>
+
     </style>
 
     <style name="Theme.SilentSOS" parent="Base.Theme.SilentSOS" />

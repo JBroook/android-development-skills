@@ -14,4 +14,8 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="register">Register</string>
     <string name="login_prompt">Already have an account? Login here</string>
+    <string name="alarm_setup_step1">1. Set Up Your Silent Alarm</string>
+    <string name="alarm_message_hint">This message will be sent to your emergency contacts. Keep it personal</string>
+    <string name="location_checkbox_prompt">Include location (Recommended)</string>
+    <string name="message">Message</string>
 </resources>

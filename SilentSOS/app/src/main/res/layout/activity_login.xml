@@ -20,7 +20,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/super_silent_name"
-        android:fontFamily="@font/inter_semibold"
         android:textSize="32sp"
         />
 
@@ -28,7 +27,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/motto"
-        android:fontFamily="@font/inter_semibold"
         android:textSize="16sp"
         />
 
@@ -36,7 +34,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/email"
-        android:fontFamily="@font/inter_semibold"
         android:textSize="16sp"
         android:paddingTop="32dp"
         />
@@ -52,7 +49,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/password"
-        android:fontFamily="@font/inter_semibold"
         android:textSize="16sp"
         />
     <EditText
@@ -67,21 +63,18 @@
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#FF8852"
         android:text="@string/login"
         android:paddingHorizontal="64dp"
         android:paddingVertical="10dp"
         android:textSize="24sp"
         android:gravity="center"
         android:layout_marginTop="10dp"
-        android:fontFamily="@font/inter_semibold"
         />
 
     <TextView
         android:id="@+id/goToRegister"
         android:text="@string/register_prompt"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/inter_semibold"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

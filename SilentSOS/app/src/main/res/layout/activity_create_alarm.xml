@@ -1,15 +1,57 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="32dp"
-    android:gravity="center">
+    android:paddingHorizontal="32dp"
+    android:paddingTop="48dp"
+    android:gravity="top">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        >
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/logo"
+            android:contentDescription="@string/logo_description"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/alarm_setup_step1"
+            android:fontFamily="@font/inter_semibold"
+            android:paddingStart="10dp"
+            android:textSize="20sp"
+            android:gravity="center"
+            tools:ignore="RtlSymmetry" />
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Home page"
+        android:text="@string/message"
+        android:textSize="16sp"
+        android:paddingTop="10dp"/>
+    
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:hint="@string/alarm_message_hint"
+        android:gravity="top"
         />
+
+    <CheckBox
+        android:id="@+id/myCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/location_checkbox_prompt"
+        android:buttonTint="@color/orange"/>
 
 </LinearLayout>
