@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">SilentSOS</string>
+    <string name="logo_description">Super Silent logo</string>
+    <string name="super_silent_name">Super Silent</string>
+    <string name="motto">Safety without hassle</string>
+    <string name="example_email">lilysmith@gmail.com</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="example_password">********</string>
+    <string name="login">Login</string>
+    <string name="register_prompt">Don’t have an account? Register</string>
+    <string name="register_now">Register Now</string>
+    <string name="register_motto">Make your free account</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="register">Register</string>
+    <string name="login_prompt">Already have an account? Login here</string>
+</resources>
