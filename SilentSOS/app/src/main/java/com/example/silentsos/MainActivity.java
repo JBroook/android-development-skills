@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,37 +46,39 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mActivationSequenceLayout;
     private LinearLayout mContactsLayout;
 
-    private boolean isAccessibilityServiceEnabled(Context context, Class<? extends AccessibilityService> service) {
-        AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
-        if (am == null) return false;
-
-        List<AccessibilityServiceInfo> enabledServices =
-                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-
-        for (AccessibilityServiceInfo enabledService : enabledServices) {
-            ServiceInfo serviceInfo = enabledService.getResolveInfo().serviceInfo;
-            if (serviceInfo.packageName.equals(context.getPackageName())
-                    && serviceInfo.name.equals(service.getName())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+//    private boolean isAccessibilityServiceEnabled(Context context, Class<? extends AccessibilityService> service) {
+//        AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+//        if (am == null) return false;
+//
+//        List<AccessibilityServiceInfo> enabledServices =
+//                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+//
+//        for (AccessibilityServiceInfo enabledService : enabledServices) {
+//            ServiceInfo serviceInfo = enabledService.getResolveInfo().serviceInfo;
+//            if (serviceInfo.packageName.equals(context.getPackageName())
+//                    && serviceInfo.name.equals(service.getName())) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onStart() {
         super.onStart();
 
-        if (!isAccessibilityServiceEnabled(this, VolumeButtonService.class)) {
-            // Permission not granted yet, prompt user to open Accessibility Settings
-            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            startActivity(intent);
-        } else {
-            // Permission already granted — continue normally
-            Log.d("AccessibilityCheck", "Accessibility Service already enabled!");
-        }
+        Intent serviceIntent = new Intent(this, SOSForegroundService.class);
+        ContextCompat.startForegroundService(this, serviceIntent);
+//        if (!isAccessibilityServiceEnabled(this, VolumeButtonService.class)) {
+//            // Permission not granted yet, prompt user to open Accessibility Settings
+//            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+//            startActivity(intent);
+//        } else {
+//            // Permission already granted — continue normally
+//            Log.d("AccessibilityCheck", "Accessibility Service already enabled!");
+//        }
     }
 
     private void vibrateDevice() {
