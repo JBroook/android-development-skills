@@ -23,47 +23,48 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/alarm_setup_step1"
+            android:layout_height="wrap_content"
+            android:text="@string/activation_sequence_page_title"
             android:fontFamily="@font/inter_semibold"
             android:paddingStart="10dp"
             android:textSize="20sp"
-            android:gravity="center"
+            android:gravity="start"
             tools:ignore="RtlSymmetry" />
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/message"
-        android:textSize="16sp"
-        android:paddingTop="10dp"/>
-
-    <com.google.android.material.card.MaterialCardView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="?attr/colorSurface"
-        app:strokeWidth="0dp"
-        android:layout_marginTop="10dp">
-        <EditText
-            android:id="@+id/messageEditView"
+        android:layout_height="wrap_content">
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="128dp"
-            android:hint="@string/alarm_message_hint"
-            android:background="?attr/colorSurface"
-            android:padding="10dp"
-            android:gravity="top"
+            android:layout_height="wrap_content"
+            android:src="@drawable/circle"
+            android:paddingVertical="20dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center">
+            <TextView
+                android:textAlignment="center"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:text="@string/listening_to_buttons"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                />
+            <TextView
+                android:textAlignment="center"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:text="@string/button_sequence_creation_tip"
+                android:textSize="14sp"
+                android:textColor="@color/white"
             />
-    </com.google.android.material.card.MaterialCardView>
-
-    <CheckBox
-        android:id="@+id/locationCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/location_checkbox_prompt"
-        android:theme="@style/checkboxStyle"/>
+        </LinearLayout>
+    </FrameLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -78,7 +79,8 @@
         app:cardCornerRadius="16dp"
         app:cardBackgroundColor="?attr/colorSurface"
         app:strokeWidth="0dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:minHeight="40dp">
         <LinearLayout
             android:id="@+id/buttonSequenceLayout"
             android:layout_width="match_parent"
@@ -88,31 +90,8 @@
             android:background="?attr/colorSurface"
             android:padding="10dp"
             >
-<!--            <ImageView-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:src="@drawable/volume_down"-->
-<!--                android:contentDescription="@string/logo_description"-->
-<!--                android:layout_marginRight="10dp"-->
-<!--                />-->
-<!--            <ImageView-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:src="@drawable/volume_down"-->
-<!--                  android:contentDescription="@string/logo_description"-->
-<!--                />-->
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:id="@+id/setNewSequenceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/set_new_sequence"
-        android:textColor="@color/orange"
-        android:paddingTop="5dp"
-        android:textSize="16sp"
-        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -121,10 +100,10 @@
         android:layout_marginTop="32dp">
 
         <Button
-            android:id="@+id/nextButton"
+            android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/next"
-        />
+            android:text="@string/back"
+            />
     </LinearLayout>
 </LinearLayout>

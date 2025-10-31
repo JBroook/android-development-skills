@@ -2,6 +2,7 @@ package com.example.silentsos;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -11,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText mEmailInput;
@@ -66,6 +69,20 @@ public class RegisterActivity extends AppCompatActivity {
                             this,
                             "Account created",
                             Toast.LENGTH_SHORT).show();
+
+                    // make new User object
+                    FirebaseUser firebaseUser = authResult.getUser();
+                    String Uid = firebaseUser.getUid();
+                    User newUser = new User(Uid);
+
+                    FirebaseFirestore database = FirebaseFirestore.getInstance();
+                    database.collection("users").document(Uid).set(newUser)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("Firestore", "User document created successfully");
+                        })
+                        .addOnFailureListener(aVoid -> {
+                            Log.d("Firestore", "User document failed to create");
+                        });
 
                     startActivity(new Intent(this, LoginActivity.class));
                     finish();

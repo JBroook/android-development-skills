@@ -4,7 +4,7 @@
         <!-- Primary brand color -->
         <item name="colorPrimary">@color/orange</item>
         <!-- Secondary color -->
-<!--        <item name="colorSecondary">@color/blue</item>-->
+        <item name="colorSurface">@color/grey</item>
         <!-- Background color -->
         <item name="android:windowBackground">@color/white</item>
         <!-- Checkbox tint globally -->

@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +17,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SilentSOS">
         <activity
+            android:name=".EditContactsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditAlarmActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ContactsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActivationSequenceActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -20,14 +37,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".LoginActivity"
+        <activity
+            android:name=".LoginActivity"
             android:label="Login Activity"
             android:theme="@style/Theme.SilentSOS" />
-
-        <activity android:name=".RegisterActivity"
+        <activity
+            android:name=".RegisterActivity"
             android:label="Register Activity"
             android:theme="@style/Theme.SilentSOS" />
+        <activity
+            android:name=".CreateAlarmActivity"
+            android:label="Alarm Activity"
+            android:theme="@style/Theme.SilentSOS" />
+
+        <service android:name=".VolumeButtonService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:label="Volume Button Service">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

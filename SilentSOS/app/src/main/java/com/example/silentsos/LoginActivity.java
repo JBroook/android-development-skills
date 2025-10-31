@@ -2,6 +2,7 @@ package com.example.silentsos;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -60,7 +63,29 @@ public class LoginActivity extends AppCompatActivity {
                             "Login succeeded",
                             Toast.LENGTH_SHORT).show();
 
-//                    startActivity(new Intent());
+
+                    String Uid = mAuth.getCurrentUser().getUid();
+                    FirebaseFirestore database = FirebaseFirestore.getInstance();
+                    database
+                            .collection("users")
+                            .document(Uid)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                // this account doesn't have an associated User object
+                                if(!documentSnapshot.exists()){
+
+                                    User newUser = new User(Uid);
+
+                                    database
+                                            .collection("users")
+                                            .document(Uid)
+                                            .set(newUser)
+                                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Created Firestore user profile"))
+                                            .addOnFailureListener(e -> Log.w("Firestore", "Error creating Firestore user", e));
+                                }
+                            });
+
+                    startActivity(new Intent(this, MainActivity.class));
                     finish();
                 })
                 .addOnFailureListener( e->

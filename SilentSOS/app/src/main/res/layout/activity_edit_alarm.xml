@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/alarm_setup_step1"
+            android:text="@string/edit_your_silent_alarm"
             android:fontFamily="@font/inter_semibold"
             android:paddingStart="10dp"
             android:textSize="20sp"
@@ -88,19 +88,6 @@
             android:background="?attr/colorSurface"
             android:padding="10dp"
             >
-<!--            <ImageView-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:src="@drawable/volume_down"-->
-<!--                android:contentDescription="@string/logo_description"-->
-<!--                android:layout_marginRight="10dp"-->
-<!--                />-->
-<!--            <ImageView-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:src="@drawable/volume_down"-->
-<!--                  android:contentDescription="@string/logo_description"-->
-<!--                />-->
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -121,10 +108,18 @@
         android:layout_marginTop="32dp">
 
         <Button
-            android:id="@+id/nextButton"
+            android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/next"
-        />
+            android:text="@string/back"
+            android:layout_marginRight="10dp"
+            />
+
+        <Button
+            android:id="@+id/finishButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/finish"
+            />
     </LinearLayout>
 </LinearLayout>

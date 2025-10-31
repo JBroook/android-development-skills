@@ -1,15 +1,268 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="32dp"
-    android:gravity="center">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Home page"
-        />
+        android:orientation="vertical"
+        android:paddingHorizontal="32dp"
+        android:paddingTop="24dp"
+        android:gravity="top">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            >
+            <ImageView
+                android:id="@+id/logoImageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/logo"
+                android:contentDescription="@string/logo_description"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/current_location"
+                    android:fontFamily="@font/inter_semibold"
+                    android:paddingStart="10dp"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    tools:ignore="RtlSymmetry" />
+                <TextView
+                    android:id="@+id/locationTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Jalan Petaling, Gelugor"
+                    android:fontFamily="@font/inter_semibold"
+                    android:paddingStart="10dp"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_page_emergency_title"
+                    android:textSize="28sp"/>
+                <TextView
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_page_emergency_tip"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_distressed_woman"/>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+            <ImageView
+                android:id="@+id/sosButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sos_button"
+                android:layout_gravity="center"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sos"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="32sp"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hold_for_3_seconds"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/silent_alarm_details"
+            android:textSize="20sp"
+            android:paddingTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/message"
+            android:textSize="16sp"
+            android:paddingTop="10dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:strokeWidth="0dp"
+            android:layout_marginTop="10dp">
+            <EditText
+                android:id="@+id/messageEditView"
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:hint="@string/no_message_set_yet"
+                android:background="?attr/colorSurface"
+                android:padding="10dp"
+                android:gravity="top"
+                android:enabled="false"
+                android:textColor="@color/black"
+                />
+        </com.google.android.material.card.MaterialCardView>
+
+        <CheckBox
+            android:id="@+id/locationCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/location_included"
+            android:theme="@style/checkboxStyle"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/activation_sequence"
+            android:textSize="16sp"
+            android:paddingTop="10dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:strokeWidth="0dp"
+            android:layout_marginTop="10dp">
+            <LinearLayout
+                android:id="@+id/buttonSequenceLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="horizontal"
+                android:background="?attr/colorSurface"
+                android:padding="10dp"
+                >
+                <!--            <ImageView-->
+                <!--                android:layout_width="40dp"-->
+                <!--                android:layout_height="40dp"-->
+                <!--                android:src="@drawable/volume_down"-->
+                <!--                android:contentDescription="@string/logo_description"-->
+                <!--                android:layout_marginRight="10dp"-->
+                <!--                />-->
+                <!--            <ImageView-->
+                <!--                android:layout_width="40dp"-->
+                <!--                android:layout_height="40dp"-->
+                <!--                android:src="@drawable/volume_down"-->
+                <!--                  android:contentDescription="@string/logo_description"-->
+                <!--                />-->
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="32dp">
+
+            <Button
+                android:id="@+id/editButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit"
+                />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/emergency_contacts"
+            android:textSize="20sp"
+            android:paddingTop="10dp"/>
+
+        <LinearLayout
+            android:id="@+id/contactLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="0dp"
+                android:layout_marginTop="10dp">
+
+                <Button
+                    android:id="@+id/addContactButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:backgroundTint="?attr/colorSurface"
+                    android:text="@string/add_a_contact"
+                    android:textColor="@color/black"/>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/how_does_it_work"
+            android:textSize="20sp"
+            android:paddingTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/how_it_works_intro"
+            android:textSize="14sp"
+            android:paddingTop="5dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="10dp">
+
+            <Button
+                android:id="@+id/finishButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/go_now"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -31,15 +31,19 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class CreateAlarmActivity extends AppCompatActivity {
-    private static final String TAG = "CreateAlarmActivity";
+public class EditAlarmActivity extends AppCompatActivity {
+    private static final String TAG = "EditAlarmActivity";
     private static final String KEY_NEW_SEQUENCE = "newSequence";
 
-    private Button mNextButton;
+    private Button mFinishButton;
     private EditText mMessageEditText;
     private CheckBox mLocationCheckbox;
     private TextView mSetNewSequenceText;
     private FirebaseAuth mAuth;
+    private User mUser;
+    private String mUserId;
+    private Button mBackButton;
+    private LinearLayout mActivationSequenceLayout;
 
     private boolean[] mSequence = {true, true, false, false, false};
 
@@ -48,7 +52,7 @@ public class CreateAlarmActivity extends AppCompatActivity {
         super.onStart();
         FirebaseApp.initializeApp(this);
         if (FirebaseAuth.getInstance().getCurrentUser()==null){
-           startActivity(new Intent(this, LoginActivity.class));
+            startActivity(new Intent(this, LoginActivity.class));
         }
 
     }
@@ -56,7 +60,7 @@ public class CreateAlarmActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_alarm);
+        setContentView(R.layout.activity_edit_alarm);
 
         // set new button sequence set up
         ActivityResultLauncher<Intent> mNewSequenceActivityResultLauncher = registerForActivityResult(
@@ -69,7 +73,12 @@ public class CreateAlarmActivity extends AppCompatActivity {
                             Intent data = result.getData();
 //                            doSomeOperations();
                             mSequence = data.getBooleanArrayExtra(KEY_NEW_SEQUENCE);
-                            updateButtonSequence();
+                            //convert primitive boolean to Boolean object
+                            List<Boolean> processedSequence = new ArrayList<Boolean>();
+                            for (boolean b : mSequence){
+                                processedSequence.add(b);
+                            }
+                            updateButtonSequence(mActivationSequenceLayout, processedSequence);
                         }
                     }
                 });
@@ -77,12 +86,13 @@ public class CreateAlarmActivity extends AppCompatActivity {
         // page set up
         mAuth = FirebaseAuth.getInstance();
 
-        mNextButton = (Button) findViewById(R.id.nextButton);
+        mFinishButton = (Button) findViewById(R.id.finishButton);
         mMessageEditText = (EditText) findViewById(R.id.messageEditView);
         mLocationCheckbox = (CheckBox) findViewById(R.id.locationCheckbox);
         mSetNewSequenceText = (TextView) findViewById(R.id.setNewSequenceText);
+        mBackButton = (Button) findViewById(R.id.backButton);
 
-        mNextButton.setOnClickListener(new View.OnClickListener() {
+        mFinishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveAlarm();
@@ -92,22 +102,76 @@ public class CreateAlarmActivity extends AppCompatActivity {
         mSetNewSequenceText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(CreateAlarmActivity.this, ActivationSequenceActivity.class );
+                Intent i = new Intent(EditAlarmActivity.this, ActivationSequenceActivity.class );
                 mNewSequenceActivityResultLauncher.launch(i);
             }
         });
 
-        // set default button sequence
-        updateButtonSequence();
+
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(EditAlarmActivity.this, MainActivity.class));
+                finish();
+            }
+        });
+
+        // restore already existing alarm buttons
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user==null){
+            Log.w("Auth", "No user is signed in yet");
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        mActivationSequenceLayout = (LinearLayout) findViewById(R.id.buttonSequenceLayout);
+        mLocationCheckbox = (CheckBox) findViewById(R.id.locationCheckbox);
+        mMessageEditText = (EditText) findViewById(R.id.messageEditView);
+        // set user values for alarm and contacts if that exists
+        mUserId = user.getUid();
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection("users")
+                .document(mUserId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {// user exists
+                        mUser = documentSnapshot.toObject(User.class);
+                        boolean alarmSet = mUser.isAlarmSet();
+                        // alarm doesn't exist yet
+                        if (!alarmSet){
+                            Toast.makeText(this, String.valueOf(alarmSet), Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(this, CreateAlarmActivity.class));
+                            finish();
+                        }
+
+                        if (mUser.isAlarmSet()) {
+                            Alarm alarm = mUser.getAlarm();
+                            mMessageEditText.setText(alarm.getMessage());
+
+                            mLocationCheckbox.setChecked(alarm.isIncludeLocation());
+
+                            updateButtonSequence(mActivationSequenceLayout, alarm.getActivationSequence());
+                        }
+                    }else{
+                        startActivity(new Intent(this, LoginActivity.class));
+                        finish();
+                    }
+                })
+                .addOnFailureListener(exception -> {
+
+                });
     }
 
-    private void updateButtonSequence(){
-        LinearLayout buttonSequenceLayout = findViewById(R.id.buttonSequenceLayout);
-        buttonSequenceLayout.removeAllViews();
-        for (boolean b : mSequence) {
+    private void updateButtonSequence(LinearLayout activationSequenceLayout, List<Boolean> sequence){
+        activationSequenceLayout.removeAllViews();
+        for (boolean b : sequence) {
             ImageView newImageView = getImageView(b);
 
-            buttonSequenceLayout.addView(newImageView);
+            activationSequenceLayout.addView(newImageView);
         }
     }
 
@@ -140,7 +204,7 @@ public class CreateAlarmActivity extends AppCompatActivity {
         }
 
         Alarm newAlarm = new Alarm(
-            includeLocation, message, sequenceList
+                includeLocation, message, sequenceList
         );
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -161,7 +225,7 @@ public class CreateAlarmActivity extends AppCompatActivity {
                 .document(Uid)
                 .update("alarm", newAlarm)
                 .addOnSuccessListener(aVoid ->{
-                    startActivity(new Intent(this, ContactsActivity.class));
+                    startActivity(new Intent(this, MainActivity.class));
                     finish();
                 })
                 .addOnFailureListener(e -> Log.w("Firestore", "Error creating Firestore user", e));
