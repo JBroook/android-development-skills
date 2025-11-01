@@ -3,6 +3,7 @@ package com.example.silentsos;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -29,6 +31,8 @@ public class SOSForegroundService extends Service {
     private int lastVolume;
     private Handler volumeHandler;
     private Runnable volumeChecker;
+
+    private PendingIntent mPendingIntent;
 
     @Override
     public void onCreate() {
@@ -50,11 +54,9 @@ public class SOSForegroundService extends Service {
 
                 if (currentVolume > lastVolume) {
                     handleVolumeButton(KeyEvent.KEYCODE_VOLUME_UP);
-//                    resetVolume(); // so user doesn't notice
                     Log.i("SOSForegroundService", "Up");
                 } else if (currentVolume < lastVolume) {
                     handleVolumeButton(KeyEvent.KEYCODE_VOLUME_DOWN);
-//                    resetVolume(); // so user doesn't notice
                     Log.i("SOSForegroundService", "Down");
                 }
 
@@ -67,16 +69,24 @@ public class SOSForegroundService extends Service {
         volumeHandler.post(volumeChecker);
     }
 
-    private void resetVolume() {
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, lastVolume, 0);
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_STICKY; // Keep running until explicitly stopped
+
+        return START_STICKY; // keep running until explicitly stopped
     }
 
     private void startForegroundServiceNotification() {
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+
+        int flagImmutable = PendingIntent.FLAG_IMMUTABLE;
+        mPendingIntent = PendingIntent.getActivity(
+                this,
+                0, // Request code
+                notificationIntent,
+                flagImmutable
+        );
+
         String channelId = "sos_service_channel";
         NotificationChannel channel = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -92,30 +102,14 @@ public class SOSForegroundService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notification = new Notification.Builder(this, channelId)
                     .setContentTitle("SOS service running")
-                    .setSmallIcon(R.drawable.ic_sos_button)
+                    .setContentText("Tap to return to the app")
+                    .setSmallIcon(R.drawable.logo)
+                    .setContentIntent(mPendingIntent)
                     .build();
         }
 
         startForeground(1, notification);
     }
-
-//    private void setupMediaSession() {
-//        mediaSession = new MediaSession(this, "SOSMediaSession");
-//        mediaSession.setCallback(new MediaSession.Callback() {
-//            @Override
-//            public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-//                KeyEvent keyEvent = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-//                if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-//                    int keyCode = keyEvent.getKeyCode();
-//                    handleVolumeButton(keyCode);
-//                }
-//                return true;
-//            }
-//        });
-//
-//        mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
-//        mediaSession.setActive(true);
-//    }
 
     private void handleVolumeButton(int keyCode) {
         long now = System.currentTimeMillis();
@@ -124,19 +118,31 @@ public class SOSForegroundService extends Service {
         }
         lastPressTime = now;
 
-
-
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) sequence.append("1");
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) sequence.append("2");
 
         Log.i("SOSForegroundService", sequence.toString());
 
         if (sequence.toString().equals(ACTIVATION_SEQUENCE)) {
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (v != null) if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                v.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
-            }
+            sendSOS();
             sequence.setLength(0);
+        }
+    }
+
+    private void sendSOS(){
+        // vibrate to let user know correct pattern was entered
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+
+        // actually send SMS
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage("+60102433090", null, "SOS", null, null);
+            Log.i("SOSForegroundService", "SMS Sending succeeded");
+        }catch (Exception e){
+            Log.e("SOSForegroundService", "SMS Sending failed");
         }
     }
 

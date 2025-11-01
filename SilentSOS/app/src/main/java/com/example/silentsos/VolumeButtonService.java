@@ -16,10 +16,7 @@ public class VolumeButtonService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        // Load user sequence from Firebase or SharedPreferences
-        Log.i("VolumeButtonService", "Accessibility service connected");
         AccessibilityServiceInfo info = getServiceInfo();
-        Log.i("VolumeButtonService", "Flags: " + info.flags);
     }
 
     @Override
@@ -55,13 +52,13 @@ public class VolumeButtonService extends AccessibilityService {
     private void vibrateDevice() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (v != null) {
-            v.vibrate(500); // Vibrate for 0.5 seconds
+            v.vibrate(500); // vibrate for 0.5 seconds
         }
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.i("VolumeButtonService", "Something happened");
+
     }
 
     @Override

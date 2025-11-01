@@ -1,10 +1,13 @@
 package com.example.silentsos;
 
+
+import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.media.Image;
 import android.os.Bundle;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.FirebaseApp;
@@ -35,6 +39,7 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_SMS_PERMISSION = 100;
     private FirebaseAuth mAuth;
     private String mUserId;
     private ImageView mSOSButton;
@@ -46,39 +51,26 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mActivationSequenceLayout;
     private LinearLayout mContactsLayout;
 
-//    private boolean isAccessibilityServiceEnabled(Context context, Class<? extends AccessibilityService> service) {
-//        AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
-//        if (am == null) return false;
-//
-//        List<AccessibilityServiceInfo> enabledServices =
-//                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-//
-//        for (AccessibilityServiceInfo enabledService : enabledServices) {
-//            ServiceInfo serviceInfo = enabledService.getResolveInfo().serviceInfo;
-//            if (serviceInfo.packageName.equals(context.getPackageName())
-//                    && serviceInfo.name.equals(service.getName())) {
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
+    // request SMS permissions
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-    @SuppressLint("ClickableViewAccessibility")
+        if (requestCode == REQUEST_SMS_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // create notification
+                Intent serviceIntent = new Intent(this, SOSForegroundService.class);
+                ContextCompat.startForegroundService(this, serviceIntent);
+            } else {
+                Toast.makeText(this, "Permission denied to send SMS", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-
-        Intent serviceIntent = new Intent(this, SOSForegroundService.class);
-        ContextCompat.startForegroundService(this, serviceIntent);
-//        if (!isAccessibilityServiceEnabled(this, VolumeButtonService.class)) {
-//            // Permission not granted yet, prompt user to open Accessibility Settings
-//            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-//            startActivity(intent);
-//        } else {
-//            // Permission already granted — continue normally
-//            Log.d("AccessibilityCheck", "Accessibility Service already enabled!");
-//        }
     }
 
     private void vibrateDevice() {
@@ -93,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, REQUEST_SMS_PERMISSION);
+        }
 
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
