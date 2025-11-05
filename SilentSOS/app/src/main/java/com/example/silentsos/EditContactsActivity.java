@@ -148,7 +148,6 @@ public class EditContactsActivity extends AppCompatActivity {
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(EditContactsActivity.this, MainActivity.class));
                 finish();
             }
         });
@@ -167,7 +166,7 @@ public class EditContactsActivity extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(EditContactsActivity.this, "Emergency contacts saved", Toast.LENGTH_SHORT).show();
 
-                            startActivity(new Intent(EditContactsActivity.this, MainActivity.class));
+                            finish();
                         })
                         .addOnFailureListener(aVoid -> {
                             Toast.makeText(EditContactsActivity.this, "Failed to save contacts", Toast.LENGTH_SHORT).show();
@@ -187,6 +186,15 @@ public class EditContactsActivity extends AppCompatActivity {
 
         TextView nameTextView = newContactView.findViewById(R.id.nameTextView);
         TextView numberTextView = newContactView.findViewById(R.id.numberTextView);
+        LinearLayout closeButton = newContactView.findViewById(R.id.closeButton);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContactsLayout.removeView(newContactView);
+                mChosenContacts.remove(newContact);
+            }
+        });
 
         nameTextView.setText(name);
         numberTextView.setText(number);

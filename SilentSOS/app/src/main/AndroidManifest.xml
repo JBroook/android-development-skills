@@ -8,11 +8,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -23,6 +26,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SilentSOS">
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false" />
         <activity
             android:name=".EditContactsActivity"
             android:exported="false" />
@@ -57,21 +63,11 @@
             android:label="Alarm Activity"
             android:theme="@style/Theme.SilentSOS" />
 
-<!--        <service android:name=".VolumeButtonService"-->
-<!--            android:exported="false"-->
-<!--            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"-->
-<!--            android:label="Volume Button Service">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.accessibilityservice.AccessibilityService" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
-
         <service
             android:name=".SOSForegroundService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="dataSync"/>
-
+            android:foregroundServiceType="dataSync|location" />
     </application>
 
 </manifest>

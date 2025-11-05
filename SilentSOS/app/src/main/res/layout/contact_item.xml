@@ -11,20 +11,36 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="start"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:paddingStart="20dp">
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Jeanne Saw"
+            android:text=""
             android:textSize="16sp"/>
         <TextView
             android:id="@+id/numberTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0164554597"
+            android:text=""
             android:textSize="12sp"/>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        >
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+
+            android:paddingEnd="5dp"
+            android:src="@drawable/ic_close_button">
+        </ImageView>
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

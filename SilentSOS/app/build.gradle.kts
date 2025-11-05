@@ -32,6 +32,7 @@ android {
     }
 }
 
+
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -40,6 +41,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.media:media:1.6.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

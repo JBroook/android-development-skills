@@ -9,9 +9,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
+import android.location.Location;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -30,16 +36,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_SMS_PERMISSION = 100;
+    private static final int PERMISSION_REQUEST_CODE = 100;
     private FirebaseAuth mAuth;
     private String mUserId;
     private ImageView mSOSButton;
@@ -50,20 +64,34 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox mLocationCheckbox;
     private LinearLayout mActivationSequenceLayout;
     private LinearLayout mContactsLayout;
+    private boolean mHoldingButton;
 
-    // request SMS permissions
+    // sos stuff
+    private String mUserMessage;
+    private List<EmergencyContact> mEmergencyContacts = new ArrayList<>();
+    private FusedLocationProviderClient mFusedLocationClient;
+    private String mFinalMessage;
+
+    // received sms and location permission, proceed with launching foreground service
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_SMS_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // create notification
-                Intent serviceIntent = new Intent(this, SOSForegroundService.class);
-                ContextCompat.startForegroundService(this, serviceIntent);
-            } else {
-                Toast.makeText(this, "Permission denied to send SMS", Toast.LENGTH_SHORT).show();
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            for (int i=0;i<grantResults.length;i++){
+                if (grantResults[i]==PackageManager.PERMISSION_GRANTED){
+                    switch (permissions[i]){
+                        case Manifest.permission.SEND_SMS:
+                            launchForegroundService();
+                            break;
+                        case Manifest.permission.ACCESS_COARSE_LOCATION:
+//                            launchForegroundService();
+                            break;
+                        case Manifest.permission.ACCESS_FINE_LOCATION:
+//                            launchForegroundService();
+                    }
+                }
             }
         }
     }
@@ -71,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    private void launchForegroundService(){
+        // create notification
+        Intent serviceIntent = new Intent(this, SOSForegroundService.class);
+        ContextCompat.startForegroundService(this, serviceIntent);
     }
 
     private void vibrateDevice() {
@@ -86,9 +120,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, REQUEST_SMS_PERMISSION);
+        // request sms and location permissions
+        List<String> permissionsToRequest = new ArrayList<>();
+        String[] requiredPermissions = new String[]{
+                Manifest.permission.SEND_SMS,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        };
+
+        for (String permission : requiredPermissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+                permissionsToRequest.add(permission);
+            }else if (permission.equals(Manifest.permission.SEND_SMS)){
+                launchForegroundService();
+            }
         }
+
+        String[] permissionArray = permissionsToRequest.toArray(new String[0]);
+        if (permissionArray.length > 0) ActivityCompat.requestPermissions(this, permissionArray, PERMISSION_REQUEST_CODE);
 
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
@@ -100,16 +149,79 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+
+        // sos button functionality
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        Handler handler = new Handler();
+        Runnable holdRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mHoldingButton = false;
+                Toast.makeText(MainActivity.this, "SOS Sent!", Toast.LENGTH_SHORT).show();
+                vibrateDevice();
+                sendSOS();
+            }
+        };
+
+
+        CountDownTimer holdTimer = new CountDownTimer(3000, 800) {
+            public void onTick(long millisUntilFinished) {
+                int countdown = (int) Math.round((double) millisUntilFinished / 1000);
+                String progress = String.valueOf(countdown);
+
+                TextView holdFor3SecText = (TextView) findViewById(R.id.holdFor3SecText);
+                TextView sosButtonText = (TextView) findViewById(R.id.SOSButtonText);
+
+                holdFor3SecText.setText("");
+                sosButtonText.setText(progress);
+            }
+
+            @Override
+            public void onFinish() {
+                TextView holdFor3SecText = (TextView) findViewById(R.id.holdFor3SecText);
+                TextView sosButtonText = (TextView) findViewById(R.id.SOSButtonText);
+
+                holdFor3SecText.setText("Hold tight");
+                sosButtonText.setText("SOS Sent");
+            }
+        };
+
+        loadUserData();
+
         mSOSButton = (ImageView) findViewById(R.id.sosButton);
         mSOSButton.setOnTouchListener(new View.OnTouchListener(){
             @Override
             public boolean onTouch(View v, MotionEvent event){
-                if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getAction() == MotionEvent.ACTION_UP || event.getAction()==MotionEvent.ACTION_CANCEL) {
                     mSOSButton.setImageResource(R.drawable.sos_button);
                     v.performClick();// for accessibility purposes
-                    vibrateDevice();
+
+                    TextView holdFor3SecText = (TextView) findViewById(R.id.holdFor3SecText);
+                    TextView sosButtonText = (TextView) findViewById(R.id.SOSButtonText);
+
+                    if (mHoldingButton){
+                        handler.removeCallbacks(holdRunnable);
+                        mHoldingButton = false;
+                        holdFor3SecText.setText(getString(R.string.hold_for_3_seconds));
+                        sosButtonText.setText(getString(R.string.sos));
+                        holdTimer.cancel();
+                    }else{
+                        holdFor3SecText.setText("Hold tight");
+                        sosButtonText.setText("SOS Sent");
+                    }
+                    return true;
+
                 }else if(event.getAction() == MotionEvent.ACTION_DOWN){
                     mSOSButton.setImageResource(R.drawable.sos_button_pressed);
+                    mHoldingButton = true;
+
+                    // show countdown till sos sent
+                    holdTimer.start();
+
+                    handler.postDelayed(holdRunnable, 3000);
+
+                    return true;
                 }
                 return true;
             }
@@ -138,6 +250,8 @@ public class MainActivity extends AppCompatActivity {
         // set user values for alarm and contacts if that exists
         mUserId = user.getUid();
 
+        // make user set up their alarm if they don't have one yet
+        // alternatively, if they have, then update main page with user info
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection("users")
                 .document(mUserId)
@@ -163,6 +277,95 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private void loadUserData(){
+        // get alarm activation sequence and emergency contact info
+        // must be done after foreground service is started to prevent it from slowing down the service
+        FirebaseApp.initializeApp(this);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid();
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database
+                .collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(
+                        documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                User user = documentSnapshot.toObject(User.class);
+                                Alarm alarm = user.getAlarm();
+                                mUserMessage = alarm.getMessage();
+                                mEmergencyContacts = user.getEmergencyContacts();
+                            }
+                        }
+                )
+                .addOnFailureListener(aVoid -> {
+                            Toast.makeText(this, "Failed to get user data", Toast.LENGTH_SHORT).show();
+                        }
+                );
+    }
+
+    private void sendSOS(){
+        // vibrate to let user know correct pattern was entered
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+
+        // start building sos message
+        mFinalMessage = mUserMessage;
+
+        // get current location
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            Log.i("SOSForegroundService", "Location successfully fetched");
+                            if (location != null) {
+                                String locationString = Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
+                                mFinalMessage += "\n\nLast Known Location: "+locationString;
+                                Log.i("SOSForegroundService", mFinalMessage);
+                                sendSMSMessage();
+                            }else{
+                                Log.i("SOSForegroundService", "Location is null");
+                                mFinalMessage += "\n\nLast Known Location was not available.";
+                                sendSMSMessage();
+                            }
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("SOSForegroundService", "Error getting last known location", e);
+                            mFinalMessage += "\n\nLast Known Location was not available.";
+                            sendSMSMessage();
+                        }
+                    });
+        }
+
+    }
+
+    private void sendSMSMessage(){
+        // actually send SMS
+        try {
+            for (EmergencyContact contact : mEmergencyContacts){
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(
+                        contact.getNumber(),
+                        null,
+                        mFinalMessage,
+                        null,
+                        null);
+                Log.i("SOSForegroundService", "SMS Sending succeeded");
+            }
+        }catch (Exception e){
+            Log.e("SOSForegroundService", "SMS Sending failed");
+        }
+    }
+
     private void updatePage(){
         if (mUser.isAlarmSet()) {
             Alarm alarm = mUser.getAlarm();
@@ -175,6 +378,17 @@ public class MainActivity extends AppCompatActivity {
 
         // set emergency contacts
         List<EmergencyContact> contacts = mUser.getEmergencyContacts();
+        mContactsLayout.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View addNewContactView = inflater.inflate(R.layout.add_new_contact_button, mContactsLayout, false);
+        mContactsLayout.addView(addNewContactView);
+        mAddContactButton = (Button) addNewContactView.findViewById(R.id.addContactButton);
+        mAddContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, EditContactsActivity.class));
+            }
+        });
         if(contacts!=null){
             for (EmergencyContact contact : contacts){
                 addNewContact(contact.getName(), contact.getNumber());
@@ -191,6 +405,9 @@ public class MainActivity extends AppCompatActivity {
 
         TextView nameTextView = newContactView.findViewById(R.id.nameTextView);
         TextView numberTextView = newContactView.findViewById(R.id.numberTextView);
+        LinearLayout closeButton = newContactView.findViewById(R.id.closeButton);
+
+        closeButton.setVisibility(View.GONE);
 
         nameTextView.setText(name);
         numberTextView.setText(number);
@@ -222,5 +439,22 @@ public class MainActivity extends AppCompatActivity {
             newImageView.setImageResource(R.drawable.volume_down);
         }
         return newImageView;
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(mUser!=null) {
+            FirebaseFirestore database = FirebaseFirestore.getInstance();
+            database.collection("users")
+                    .document(mUserId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {// user exists
+                            mUser = documentSnapshot.toObject(User.class);
+                            updatePage();
+                        }
+                    });
+        }
     }
 }

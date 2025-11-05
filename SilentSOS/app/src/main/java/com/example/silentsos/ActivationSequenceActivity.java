@@ -32,10 +32,14 @@ public class ActivationSequenceActivity extends AppCompatActivity {
     private static final String KEY_NEW_SEQUENCE = "newSequence";
 
     private Button mBackButton;
-    private FirebaseAuth mAuth;
+    private Button mConfirmButton;
+    private Button mResetButton;
+    private TextView mSequenceBarTitle;
     private LinearLayout mButtonSequenceLayout;
 
     private List<Boolean> mSequence = new ArrayList<Boolean>();
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onStart() {
@@ -54,12 +58,33 @@ public class ActivationSequenceActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        mSequenceBarTitle = (TextView) findViewById(R.id.sequenceBarTitle);
+        mSequenceBarTitle.setText(getString(R.string.activation_sequence)+" (0/5)");
+
         mBackButton = (Button) findViewById(R.id.backButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
+            }
+        });
+
+        mConfirmButton = (Button) findViewById(R.id.confirmButton);
+
+        mConfirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 saveSequenceAndLeave();
+            }
+        });
+
+        mResetButton = (Button) findViewById(R.id.resetButton);
+
+        mResetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetSequence();
             }
         });
 
@@ -88,22 +113,33 @@ public class ActivationSequenceActivity extends AppCompatActivity {
         finish();
     }
 
+    private void resetSequence(){
+        mButtonSequenceLayout.removeAllViews();
+        mSequence.clear();
+        mSequenceBarTitle.setText(getString(R.string.activation_sequence)+" (0/5)");
+    }
+
     private void addNewButton(boolean isUp){
-        mSequence.add(isUp);
-        ImageView newImageView = new ImageView(this);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100, 100);
-        layoutParams.setMargins(0, 0, 10, 0);
+        if(mSequence.size()<5) {
+            mSequence.add(isUp);
+            ImageView newImageView = new ImageView(this);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100, 100);
+            layoutParams.setMargins(0, 0, 10, 0);
 
-        newImageView.setLayoutParams(layoutParams);
+            newImageView.setLayoutParams(layoutParams);
 
-        if(isUp){
-            newImageView.setContentDescription("Up");
-            newImageView.setImageResource(R.drawable.volume_up);
+            if (isUp) {
+                newImageView.setContentDescription("Up");
+                newImageView.setImageResource(R.drawable.volume_up);
+            } else {
+                newImageView.setContentDescription("Down");
+                newImageView.setImageResource(R.drawable.volume_down);
+            }
+
+            mButtonSequenceLayout.addView(newImageView);
+            mSequenceBarTitle.setText(getString(R.string.activation_sequence) + " (" + mSequence.size() + "/5)");
         }else{
-            newImageView.setContentDescription("Down");
-            newImageView.setImageResource(R.drawable.volume_down);
+            Toast.makeText(this, "Max length reached", Toast.LENGTH_SHORT).show();
         }
-
-        mButtonSequenceLayout.addView(newImageView);
     }
 }

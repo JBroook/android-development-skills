@@ -45,4 +45,6 @@
     <string name="edit_your_silent_alarm">Edit Your Silent Alarm</string>
     <string name="change_emergency_contacts">Change Emergency Contacts</string>
     <string name="accessibility_service_description">Accessibility service used to listen to volume buttons</string>
+    <string name="confirm">Confirm</string>
+    <string name="reset">Reset</string>
 </resources>

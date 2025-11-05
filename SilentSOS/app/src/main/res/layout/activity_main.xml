@@ -55,7 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:gravity="center">
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,7 +70,8 @@
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:text="@string/main_page_emergency_tip"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_regular"/>
             </LinearLayout>
             <ImageView
                 android:layout_width="wrap_content"
@@ -92,8 +94,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
                 <TextView
+                    android:id="@+id/SOSButtonText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sos"
@@ -102,6 +106,7 @@
                     android:textSize="32sp"
                     />
                 <TextView
+                    android:id="@+id/holdFor3SecText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/hold_for_3_seconds"
@@ -140,7 +145,7 @@
                 android:padding="10dp"
                 android:gravity="top"
                 android:enabled="false"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnBackground"
                 />
         </com.google.android.material.card.MaterialCardView>
 
@@ -149,7 +154,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/location_included"
-            android:theme="@style/checkboxStyle"/>
+            android:theme="@style/checkboxStyle"
+            android:enabled="false"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -232,7 +238,7 @@
                     android:gravity="center_vertical"
                     android:backgroundTint="?attr/colorSurface"
                     android:text="@string/add_a_contact"
-                    android:textColor="@color/black"/>
+                    android:textColor="?attr/colorOnBackground"/>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
@@ -248,7 +254,8 @@
             android:layout_height="wrap_content"
             android:text="@string/how_it_works_intro"
             android:textSize="14sp"
-            android:paddingTop="5dp"/>
+            android:paddingTop="5dp"
+            android:fontFamily="@font/inter_regular"/>
 
         <LinearLayout
             android:layout_width="match_parent"

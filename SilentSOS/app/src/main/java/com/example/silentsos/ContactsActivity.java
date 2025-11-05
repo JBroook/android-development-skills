@@ -150,7 +150,6 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     private void addNewContact(String name, String number){
-        Toast.makeText(ContactsActivity.this, name+" "+number, Toast.LENGTH_SHORT).show();
 
         EmergencyContact newContact = new EmergencyContact(name, number);
         mChosenContacts.add(newContact);
@@ -161,6 +160,15 @@ public class ContactsActivity extends AppCompatActivity {
 
         TextView nameTextView = newContactView.findViewById(R.id.nameTextView);
         TextView numberTextView = newContactView.findViewById(R.id.numberTextView);
+        LinearLayout closeButton = newContactView.findViewById(R.id.closeButton);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContactsLayout.removeView(newContactView);
+                mChosenContacts.remove(newContact);
+            }
+        });
 
         nameTextView.setText(name);
         numberTextView.setText(number);

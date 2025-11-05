@@ -111,7 +111,6 @@ public class EditAlarmActivity extends AppCompatActivity {
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(EditAlarmActivity.this, MainActivity.class));
                 finish();
             }
         });
@@ -225,12 +224,11 @@ public class EditAlarmActivity extends AppCompatActivity {
                 .document(Uid)
                 .update("alarm", newAlarm)
                 .addOnSuccessListener(aVoid ->{
-                    startActivity(new Intent(this, MainActivity.class));
                     finish();
                 })
                 .addOnFailureListener(e -> Log.w("Firestore", "Error creating Firestore user", e));
 
-        Toast.makeText(this, "Alarm created", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Alarm updated", Toast.LENGTH_SHORT).show();
 
 
     }

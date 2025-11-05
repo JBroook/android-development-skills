@@ -1,7 +1,7 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="32dp"
     android:gravity="center">
@@ -37,13 +37,23 @@
         android:textSize="16sp"
         android:paddingTop="32dp"
         />
-    <EditText
-        android:id="@+id/emailInput"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/example_email"
-        android:inputType="textEmailAddress"
-        />
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:strokeWidth="0dp"
+        android:layout_marginTop="10dp">
+        <EditText
+            android:id="@+id/emailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/example_email"
+            android:inputType="textEmailAddress"
+            android:padding="10dp"
+            android:background="@null"
+            />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:layout_width="match_parent"
@@ -51,13 +61,23 @@
         android:text="@string/password"
         android:textSize="16sp"
         />
-    <EditText
-        android:id="@+id/passwordInput"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/example_password"
-        android:inputType="textPassword"
-        />
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:strokeWidth="0dp"
+        android:layout_marginTop="10dp">
+        <EditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/example_password"
+            android:inputType="textPassword"
+            android:padding="10dp"
+            android:background="@null"
+            />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:layout_width="match_parent"
@@ -65,13 +85,23 @@
         android:text="@string/confirm_password"
         android:textSize="16sp"
         />
-    <EditText
-        android:id="@+id/confirmPasswordInput"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/example_password"
-        android:inputType="textPassword"
-        />
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:strokeWidth="0dp"
+        android:layout_marginTop="10dp">
+        <EditText
+            android:id="@+id/confirmPasswordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/example_password"
+            android:inputType="textPassword"
+            android:padding="10dp"
+            android:background="@null"
+            />
+    </com.google.android.material.card.MaterialCardView>
 
     <Button
         android:id="@+id/registerButton"
