@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.silentsos"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -30,6 +30,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 
@@ -42,6 +45,9 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.media:media:1.6.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("com.google.android.material:material:1.14.0-alpha06")
+    implementation("com.tbuonomo:dotsindicator:4.3")
 
     implementation(libs.appcompat)
     implementation(libs.material)

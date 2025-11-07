@@ -36,8 +36,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-
 
 public class SOSForegroundService extends Service {
     private AudioManager audioManager;
@@ -57,7 +55,6 @@ public class SOSForegroundService extends Service {
 
     private String mFinalMessage;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,7 +66,6 @@ public class SOSForegroundService extends Service {
         lastVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         startVolumePolling();
         loadUserData();
@@ -135,7 +131,6 @@ public class SOSForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         return START_STICKY; // keep running until explicitly stopped
     }
 
@@ -165,7 +160,7 @@ public class SOSForegroundService extends Service {
         Notification notification = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notification = new Notification.Builder(this, channelId)
-                    .setContentTitle("SOS service running")
+                    .setContentTitle("Super Silent is running")
                     .setContentText("Tap to return to the app")
                     .setSmallIcon(R.drawable.logo)
                     .setContentIntent(mPendingIntent)
@@ -210,7 +205,6 @@ public class SOSForegroundService extends Service {
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
                             Log.i("SOSForegroundService", "Location successfully fetched");
                             if (location != null) {
                                 String locationString = Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);

@@ -7,8 +7,11 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.media.Image;
 import android.os.Build;
@@ -47,8 +50,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.Inflater;
 
 
@@ -65,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mActivationSequenceLayout;
     private LinearLayout mContactsLayout;
     private boolean mHoldingButton;
+    private TextView mLocationText;
 
     // sos stuff
     private String mUserMessage;
@@ -87,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case Manifest.permission.ACCESS_COARSE_LOCATION:
 //                            launchForegroundService();
+
                             break;
                         case Manifest.permission.ACCESS_FINE_LOCATION:
 //                            launchForegroundService();
@@ -120,6 +127,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences preferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+        boolean firstLaunch = preferences.getBoolean("first_launch", true);
+        if (firstLaunch) {
+            startActivity(new Intent(this, WelcomeActivity.class));
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("first_launch", false);
+            editor.apply();
+        }
+
         // request sms and location permissions
         List<String> permissionsToRequest = new ArrayList<>();
         String[] requiredPermissions = new String[]{
@@ -152,6 +168,31 @@ public class MainActivity extends AppCompatActivity {
 
         // sos button functionality
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        mLocationText = (TextView) findViewById(R.id.locationTextView);
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null){
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(
+                                    latitude, longitude, 1
+                            );
+                            if (addresses != null && !addresses.isEmpty()) {
+                                Address address = addresses.get(0);
+                                String locationName = address.getAddressLine(0); // Get the full address line
+                                mLocationText.setText(locationName);
+                            }else{
+                                mLocationText.setText("Location not available");
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }else{
+                        mLocationText.setText("Location not available");
+                    }
+                });
 
         Handler handler = new Handler();
         Runnable holdRunnable = new Runnable() {
@@ -293,9 +334,13 @@ public class MainActivity extends AppCompatActivity {
                         documentSnapshot -> {
                             if (documentSnapshot.exists()) {
                                 User user = documentSnapshot.toObject(User.class);
-                                Alarm alarm = user.getAlarm();
-                                mUserMessage = alarm.getMessage();
-                                mEmergencyContacts = user.getEmergencyContacts();
+                                if(user.isAlarmSet()) {
+                                    Alarm alarm = user.getAlarm();
+                                    mUserMessage = alarm.getMessage();
+                                    mEmergencyContacts = user.getEmergencyContacts();
+                                }else{
+                                    startActivity(new Intent(this, CreateAlarmActivity.class));
+                                }
                             }
                         }
                 )

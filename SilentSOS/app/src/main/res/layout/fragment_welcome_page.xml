@@ -1,0 +1,40 @@
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo"
+        />
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome to Super Silent!"
+        android:gravity="center"
+        android:textSize="32sp"/>
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="If you've ever been in an emergency where you needed to signal for help silently, Super Silent is perfect for you!"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:fontFamily="@font/inter_regular"/>
+    <Button
+        android:id="@+id/signInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_in"
+        android:paddingHorizontal="64dp"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        />
+
+</LinearLayout>

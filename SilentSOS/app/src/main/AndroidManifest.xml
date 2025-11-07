@@ -27,6 +27,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SilentSOS">
         <activity
+            android:name=".ScrollingActivity"
+            android:exported="false"
+            android:label="@string/title_activity_scrolling"
+            android:theme="@style/Theme.SilentSOS.NoActionBar" />
+        <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
         <activity
