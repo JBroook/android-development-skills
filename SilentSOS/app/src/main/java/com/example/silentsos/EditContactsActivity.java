@@ -165,7 +165,7 @@ public class EditContactsActivity extends AppCompatActivity {
                         .update("emergencyContacts",mChosenContacts)
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(EditContactsActivity.this, "Emergency contacts saved", Toast.LENGTH_SHORT).show();
-
+                            SOSForegroundService.triggerReload(EditContactsActivity.this);
                             finish();
                         })
                         .addOnFailureListener(aVoid -> {

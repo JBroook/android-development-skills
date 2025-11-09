@@ -102,15 +102,19 @@ public class ActivationSequenceActivity extends AppCompatActivity {
     }
 
     private void saveSequenceAndLeave(){
-        Intent data = new Intent();
-        // converting List<Boolean> to primitive boolean[]
-        boolean[] booleanSequence = new boolean[mSequence.size()];
-        for (int i = 0; i < mSequence.size(); i++) {
-            booleanSequence[i] = mSequence.get(i);
+        if(mSequence.size()==4) {
+            Intent data = new Intent();
+            // converting List<Boolean> to primitive boolean[]
+            boolean[] booleanSequence = new boolean[mSequence.size()];
+            for (int i = 0; i < mSequence.size(); i++) {
+                booleanSequence[i] = mSequence.get(i);
+            }
+            data.putExtra(KEY_NEW_SEQUENCE, booleanSequence);
+            setResult(RESULT_OK, data);
+            finish();
+        }else{
+            Toast.makeText(this, "Sequence must be 4 buttons minimum", Toast.LENGTH_SHORT).show();
         }
-        data.putExtra(KEY_NEW_SEQUENCE, booleanSequence);
-        setResult(RESULT_OK, data);
-        finish();
     }
 
     private void resetSequence(){

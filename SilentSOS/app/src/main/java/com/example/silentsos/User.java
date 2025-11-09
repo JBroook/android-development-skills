@@ -8,6 +8,8 @@ public class User {
     private boolean mAlarmSet = false;
     private Alarm mAlarm;
     private List<EmergencyContact> mEmergencyContacts;
+    private String mEmail;
+    private String mName;
 
     // for firebase
     public User(){}
@@ -40,5 +42,21 @@ public class User {
 
     public void setAlarmSet(boolean alarmSet) {
         mAlarmSet = alarmSet;
+    }
+
+    public String getEmail() {
+        return mEmail;
+    }
+
+    public void setEmail(String email) {
+        mEmail = email;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 }

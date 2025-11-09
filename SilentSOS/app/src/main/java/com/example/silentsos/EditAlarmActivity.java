@@ -230,6 +230,6 @@ public class EditAlarmActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Alarm updated", Toast.LENGTH_SHORT).show();
 
-
+        SOSForegroundService.triggerReload(this);
     }
 }

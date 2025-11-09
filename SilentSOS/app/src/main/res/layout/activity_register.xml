@@ -33,9 +33,36 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/email"
+        android:text="@string/name"
         android:textSize="16sp"
         android:paddingTop="32dp"
+        />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:strokeWidth="0dp"
+        android:layout_marginTop="10dp">
+        <EditText
+            android:id="@+id/nameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/example_name"
+            android:inputType="textEmailAddress"
+            android:padding="10dp"
+            android:background="@null"
+            />
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/email"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
         />
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -60,6 +87,7 @@
         android:layout_height="wrap_content"
         android:text="@string/password"
         android:textSize="16sp"
+        android:paddingTop="10dp"
         />
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -84,6 +112,7 @@
         android:layout_height="wrap_content"
         android:text="@string/confirm_password"
         android:textSize="16sp"
+        android:paddingTop="10dp"
         />
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

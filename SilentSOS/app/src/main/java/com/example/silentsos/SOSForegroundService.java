@@ -33,9 +33,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SOSForegroundService extends Service {
     private AudioManager audioManager;
@@ -55,6 +57,12 @@ public class SOSForegroundService extends Service {
 
     private String mFinalMessage;
 
+    public static void triggerReload(Context context) {
+        Intent intent = new Intent(context, SOSForegroundService.class);
+        intent.setAction("ACTION_RELOAD_USER_DATA");
+        context.startService(intent);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -72,6 +80,10 @@ public class SOSForegroundService extends Service {
     }
 
     private void loadUserData(){
+        if (volumeHandler != null && volumeChecker != null) {
+            volumeHandler.removeCallbacks(volumeChecker);
+        }
+
         // get alarm activation sequence and emergency contact info
         // must be done after foreground service is started to prevent it from slowing down the service
         FirebaseApp.initializeApp(this);
@@ -82,7 +94,7 @@ public class SOSForegroundService extends Service {
         database
                 .collection("users")
                 .document(userId)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener(
                         documentSnapshot -> {
                             if (documentSnapshot.exists()) {
@@ -93,6 +105,8 @@ public class SOSForegroundService extends Service {
                                 mEmergencyContacts = user.getEmergencyContacts();
 
                                 startVolumePolling();
+                                Log.i("SOSForegroundService", "z: "+mUserMessage);
+                                Toast.makeText(this, "Super Silent is now listening!", Toast.LENGTH_SHORT).show();
                             }else{
                                 stopSelf();
                             }
@@ -131,6 +145,14 @@ public class SOSForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            String action = intent.getAction();
+            if (Objects.equals(action, "ACTION_RELOAD_USER_DATA")){
+                Log.i("SOSForegroundService", "Reloading user data");
+                loadUserData();
+            }
+        }
+
         return START_STICKY; // keep running until explicitly stopped
     }
 
@@ -141,7 +163,7 @@ public class SOSForegroundService extends Service {
         int flagImmutable = PendingIntent.FLAG_IMMUTABLE;
         mPendingIntent = PendingIntent.getActivity(
                 this,
-                0, // Request code
+                0,
                 notificationIntent,
                 flagImmutable
         );
@@ -197,6 +219,7 @@ public class SOSForegroundService extends Service {
 
         // start building sos message
         mFinalMessage = mUserMessage;
+        Log.i("SOSForegroundService","z2: "+mFinalMessage);
 
         // get current location
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -226,6 +249,9 @@ public class SOSForegroundService extends Service {
                             sendSMSMessage();
                         }
                     });
+        }else{
+            mFinalMessage += "\n\nLast known location was not available.";
+            sendSMSMessage();
         }
 
     }
@@ -254,6 +280,7 @@ public class SOSForegroundService extends Service {
         if (volumeHandler != null && volumeChecker != null) {
             volumeHandler.removeCallbacks(volumeChecker);
         }
+        stopForeground(true);
     }
 
     @Nullable

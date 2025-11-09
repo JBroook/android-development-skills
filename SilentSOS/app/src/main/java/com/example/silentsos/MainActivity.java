@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mContactsLayout;
     private boolean mHoldingButton;
     private TextView mLocationText;
+    private ImageView mUserImage;
+    private Button mGoNowButton;
 
     // sos stuff
     private String mUserMessage;
@@ -129,11 +131,23 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences preferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
         boolean firstLaunch = preferences.getBoolean("first_launch", true);
+        startActivity(new Intent(this, WelcomeActivity.class));
         if (firstLaunch) {
             startActivity(new Intent(this, WelcomeActivity.class));
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean("first_launch", false);
             editor.apply();
+        }
+
+
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user==null){
+            Log.w("Auth", "No user is signed in yet");
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
         }
 
         // request sms and location permissions
@@ -155,44 +169,19 @@ public class MainActivity extends AppCompatActivity {
         String[] permissionArray = permissionsToRequest.toArray(new String[0]);
         if (permissionArray.length > 0) ActivityCompat.requestPermissions(this, permissionArray, PERMISSION_REQUEST_CODE);
 
-        FirebaseApp.initializeApp(this);
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user==null){
-            Log.w("Auth", "No user is signed in yet");
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+        // user account page
+        mUserImage = (ImageView) findViewById(R.id.userImage);
+        mUserImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, UserActivity.class));
+            }
+        });
 
 
         // sos button functionality
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         mLocationText = (TextView) findViewById(R.id.locationTextView);
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null){
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        try {
-                            List<Address> addresses = geocoder.getFromLocation(
-                                    latitude, longitude, 1
-                            );
-                            if (addresses != null && !addresses.isEmpty()) {
-                                Address address = addresses.get(0);
-                                String locationName = address.getAddressLine(0); // Get the full address line
-                                mLocationText.setText(locationName);
-                            }else{
-                                mLocationText.setText("Location not available");
-                            }
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }else{
-                        mLocationText.setText("Location not available");
-                    }
-                });
+        setCurrentLocation();
 
         Handler handler = new Handler();
         Runnable holdRunnable = new Runnable() {
@@ -316,6 +305,61 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(exception -> {
 
                 });
+
+        mGoNowButton = (Button) findViewById(R.id.goNowButton);
+        mGoNowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, TutorialActivity.class));
+            }
+        });
+    }
+
+    private void setCurrentLocation(){
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            updateLocationText(location);
+                        } else {
+                            mFusedLocationClient.getCurrentLocation(
+                                    com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
+                                    null
+                            ).addOnSuccessListener(newLocation -> {
+                                if (newLocation != null) {
+                                    updateLocationText(newLocation);
+                                } else {
+                                    mLocationText.setText("Location not available");
+                                }
+                            });
+                        }
+                    });
+        }else{
+            mLocationText.setText("Location not available");
+        }
+    }
+
+    private void updateLocationText(Location location){
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        try {
+            List<Address> addresses = geocoder.getFromLocation(
+                    latitude, longitude, 1
+            );
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                String locationName = address.getAddressLine(0); // Get the full address line
+                mLocationText.setText(locationName);
+            } else {
+                mLocationText.setText("Location not available");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void loadUserData(){
@@ -415,6 +459,7 @@ public class MainActivity extends AppCompatActivity {
         if (mUser.isAlarmSet()) {
             Alarm alarm = mUser.getAlarm();
             mMessageEditText.setText(alarm.getMessage());
+            mUserMessage = alarm.getMessage();
 
             mLocationCheckbox.setChecked(alarm.isIncludeLocation());
 
@@ -422,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // set emergency contacts
-        List<EmergencyContact> contacts = mUser.getEmergencyContacts();
+        mEmergencyContacts = mUser.getEmergencyContacts();
         mContactsLayout.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
         final View addNewContactView = inflater.inflate(R.layout.add_new_contact_button, mContactsLayout, false);
@@ -434,8 +479,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, EditContactsActivity.class));
             }
         });
-        if(contacts!=null){
-            for (EmergencyContact contact : contacts){
+        if(mEmergencyContacts!=null){
+            for (EmergencyContact contact : mEmergencyContacts){
                 addNewContact(contact.getName(), contact.getNumber());
             }
         }
@@ -489,6 +534,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
+        setCurrentLocation();
+
         if(mUser!=null) {
             FirebaseFirestore database = FirebaseFirestore.getInstance();
             database.collection("users")

@@ -1,8 +1,6 @@
 package com.example.silentsos;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,13 +17,13 @@ import java.util.Objects;
 
 // Instances of this class are fragments representing a single
 // object in the collection.
-public class WelcomePageFragment extends Fragment {
+public class TutorialPageFragment extends Fragment {
     public static final String ARG_OBJECT = "object";
     private String mTitle;
     private String mDescription;
     private int mImage;
 
-    public WelcomePageFragment(String title, String description, int image) {
+    public TutorialPageFragment(String title, String description, int image) {
         super();
         this.mTitle = title;
         this.mDescription = description;
@@ -51,16 +49,18 @@ public class WelcomePageFragment extends Fragment {
                 .setImageResource(mImage);
 
         // last page
-        if(Objects.equals(mTitle, "What now?")){
+        if(Objects.equals(mTitle, "Got it?")){
             Button signInButton = view.findViewById(R.id.signInButton);
             signInButton.setVisibility(View.VISIBLE);
+            signInButton.setText("Head Back");
             signInButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(getActivity(), RegisterActivity.class));
+                    startActivity(new Intent(getActivity(), MainActivity.class));
                     getActivity().finish();
                 }
             });
         }
+
     }
 }

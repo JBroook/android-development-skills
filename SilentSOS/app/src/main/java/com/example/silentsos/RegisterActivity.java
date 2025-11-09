@@ -21,6 +21,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mConfirmPasswordInput;
     private Button mRegisterButton;
     private TextView mGoToLogin;
+    private EditText mNameInput;
 
     private FirebaseAuth mAuth;
 
@@ -33,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         mEmailInput = (EditText) findViewById(R.id.emailInput);
+        mNameInput = (EditText) findViewById(R.id.nameInput);
         mPasswordInput = (EditText) findViewById(R.id.passwordInput);
         mConfirmPasswordInput = (EditText) findViewById(R.id.confirmPasswordInput);
         mRegisterButton = (Button) findViewById(R.id.registerButton);
@@ -40,16 +42,17 @@ public class RegisterActivity extends AppCompatActivity {
 
         mRegisterButton.setOnClickListener(v -> registerUser());
         mGoToLogin.setOnClickListener(v ->
-            startActivity(new Intent(this, LoginActivity.class))
+            finish()
         );
     }
 
     private void registerUser(){
         String email = mEmailInput.getText().toString().trim();
+        String name = mNameInput.getText().toString().trim();
         String password = mPasswordInput.getText().toString().trim();
         String confirmPassword = mConfirmPasswordInput.getText().toString().trim();
 
-        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()){
+        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || name.isEmpty()){
             Toast.makeText(this, "Please fill in all fields",
                     Toast.LENGTH_SHORT).show();
 
@@ -74,6 +77,8 @@ public class RegisterActivity extends AppCompatActivity {
                     FirebaseUser firebaseUser = authResult.getUser();
                     String Uid = firebaseUser.getUid();
                     User newUser = new User(Uid);
+                    newUser.setEmail(email);
+                    newUser.setName(name);
 
                     FirebaseFirestore database = FirebaseFirestore.getInstance();
                     database.collection("users").document(Uid).set(newUser)
